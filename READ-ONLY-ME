@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Library Book Management System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { margin: 5px; }
+    .book-list { margin-top: 20px; }
+    .book-list tr { border-bottom: 1px solid #ccc; }
+    .book-list th, .book-list td { padding: 8px 12px; }
+    .available { color: green; }
+    .borrowed { color: red; }
+    .hidden { display: none; }
+    .login-box { border: 1px solid #ccc; padding: 20px; max-width: 300px; margin: auto; margin-top: 100px;}
+    .center { text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="loginPage" class="login-box">
+    <h2 class="center">Login</h2>
+    <input type="text" id="username" placeholder="Username" /><br>
+    <input type="password" id="password" placeholder="Password" /><br>
+    <button onclick="login()">Login</button>
+    <div id="loginMsg" style="color:red; margin-top:10px;" class="center"></div>
+  </div>
+
+  <!-- Main App Page -->
+  <div id="appPage" class="hidden">
+    <h2>Library Book Management System</h2>
+
+    <div>
+      <span>Welcome, <b id="currentUser"></b>! <button onclick="logout()">Logout</button></span>
+    </div>
+
+    <div>
+      <input type="text" id="bookId" placeholder="Book ID" />
+      <input type="text" id="bookTitle" placeholder="Title" />
+      <input type="text" id="bookAuthor" placeholder="Author" />
+      <button onclick="addBook()">Add Book</button>
+    </div>
+
+    <div>
+      <input type="text" id="searchKeyword" placeholder="Search by Title/Author" />
+      <button onclick="searchBook()">Search</button>
+      <button onclick="displayBooks()">Show All</button>
+    </div>
+
+    <table class="book-list" id="bookTable">
+      <thead>
+        <tr>
+          <th>ID</th><th>Title</th><th>Author</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Demo users
+    const users = [
+      { username: "admin", password: "admin" },
+      { username: "user", password: "user" }
+    ];
+    let loggedInUser = null;
+    let books = [];
+
+    function login() {
+      const uname = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const found = users.find(u => u.username === uname && u.password === pass);
+      if (found) {
+        loggedInUser = uname;
+        document.getElementById('currentUser').innerText = loggedInUser;
+        document.getElementById('loginMsg').innerText = '';
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('appPage').classList.remove('hidden');
+        displayBooks();
+      } else {
+        document.getElementById('loginMsg').innerText = 'Invalid login!';
+      }
+    }
+
+    function logout() {
+      loggedInUser = null;
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('appPage').classList.add('hidden');
+      document.getElementById('loginMsg').innerText = '';
+    }
+
+    function addBook() {
+      const id = document.getElementById('bookId').value;
+      const title = document.getElementById('bookTitle').value;
+      const author = document.getElementById('bookAuthor').value;
+      if (!id || !title || !author) {
+        alert('Please fill all fields.');
+        return;
+      }
+      if (books.find(b => b.id === id)) {
+        alert('Book ID already exists.');
+        return;
+      }
+      books.push({ id, title, author, available: true });
+      displayBooks();
+      document.getElementById('bookId').value = '';
+      document.getElementById('bookTitle').value = '';
+      document.getElementById('bookAuthor').value = '';
+    }
+
+    function displayBooks(filtered = books) {
+      const tableBody = document.getElementById('bookTable').getElementsByTagName('tbody')[0];
+      tableBody.innerHTML = '';
+      filtered.forEach(book => {
+        const row = tableBody.insertRow();
+        row.insertCell(0).innerText = book.id;
+        row.insertCell(1).innerText = book.title;
+        row.insertCell(2).innerText = book.author;
+        row.insertCell(3).innerHTML = `<span class="${book.available ? 'available' : 'borrowed'}">${book.available ? 'Available' : 'Borrowed'}</span>`;
+        row.insertCell(4).innerHTML = book.available
+          ? `<button onclick="borrowBook('${book.id}')">Borrow</button>`
+          : `<button onclick="returnBook('${book.id}')">Return</button>`;
+      });
+    }
+
+    function searchBook() {
+      const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+      const filtered = books.filter(book =>
+        book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword)
+      );
+      displayBooks(filtered);
+    }
+
+    function borrowBook(id) {
+      const book = books.find(b => b.id === id);
+      if (book && book.available) {
+        book.available = false;
+        displayBooks();
+      }
+    }
+
+    function returnBook(id) {
+      const book = books.find(b => b.id === id);
+      if (book && !book.available) {
+        book.available = true;
+        displayBooks();
+      }
+    }
+
+    // Initial state
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('appPage').classList.add('hidden');
+  </script>
+</body>
+</html>
