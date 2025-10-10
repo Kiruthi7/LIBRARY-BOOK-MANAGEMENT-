@@ -1,9 +1,9 @@
+.
 
-
-Aim:
+#Aim:
 To design and develop a Library Book Management System that helps in managing library operations efficiently — including book registration, issue and return processes, user management, and record maintenance — reducing manual work and improving accessibility and accuracy.
 
-Technology Used:
+#Technology Used:
 
 Frontend:
 
@@ -25,7 +25,7 @@ Tools & Platform:
 
 •Deployment: Netlify / Vercel (Frontend) and Render / Railway (Backend)
 
-Features:
+#Features:
 
 User Authentication:
 •Login and registration for admin and users.
